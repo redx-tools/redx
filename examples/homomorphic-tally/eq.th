@@ -1,0 +1,4 @@
+fst(pair(x,y)) = x
+snd(pair(x,y)) = y
+dec(enc(m, pk(kk), r), kk) = m
+cmul(enc(x1, p, r1), enc(x2, p, r2)) = enc(vadd_ud(x1, x2), p, rmul_ud(r1, r2))

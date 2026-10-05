@@ -1,0 +1,4 @@
+(snd(sm) != m.1 &&
+  verify(fst(sm), snd(sm), pk(sample_key(rsk))) = ok
+  ->
+  div_ud(snd(sm), sample_grp(~rd_2)) != div_ud(m.1, sample_grp(~rd_2)))

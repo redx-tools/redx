@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+
+eval $(opam env)
+
+source "$SCRIPT_DIR/tamarin-env.sh"
+
+cd "$SCRIPT_DIR"
+
+OCAMLRUNPARAM=b dune exec redsyn -- "$@"

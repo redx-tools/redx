@@ -1,0 +1,4 @@
+fst(pair(x,y)) = x
+snd(pair(x,y)) = y
+proj(zero_ud(), m) = fst(m)
+proj(one_ud(), m) = snd(m)

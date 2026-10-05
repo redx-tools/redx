@@ -1,0 +1,5 @@
+fst(pair(x,y)) = x
+snd(pair(x,y)) = y
+xor_ud(x, x) = zero_ud()
+xor_ud(x, zero_ud()) = x
+xor_ud(x, xor_ud(x, y)) = y

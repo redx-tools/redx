@@ -1,0 +1,3 @@
+dec(enc(m,pk(sk),r),sk) = m
+fst(pair(m0,m1)) = m0 
+snd(pair(m0,m1)) = m1

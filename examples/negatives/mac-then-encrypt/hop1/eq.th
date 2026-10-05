@@ -1,0 +1,4 @@
+fst(pair(x,y)) = x
+snd(pair(x,y)) = y
+vermac(m, mac(k,m), k) = ok()
+dec(k, enc(k,r,m)) = m

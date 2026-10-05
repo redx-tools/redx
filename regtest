@@ -1,0 +1,182 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+cd "$SCRIPT_DIR"
+
+usage="Usage: regtest [--skip SPEC]... [BACKEND] [EXAMPLE]
+Runs each example under examples/ (any directory containing a G.os)
+through both backends and diffs the produced -R.os and -sc.th files
+against the in-place gold (sample-<backend>-*). A gold R.os containing
+the single word 'null' means the backend is expected to produce no
+reduction.
+If BACKEND (proverif|tamarin|tamarin-unchained) is given, only that backend is run.
+If EXAMPLE is given, only that example under examples/ is run.
+Each backend run reports its wall time; the summary reports total time
+per backend.
+--skip SPEC skips an example; SPEC is either BACKEND:EXAMPLE (one
+  backend) or EXAMPLE (all backends). Repeatable.
+-w[=FILE] also write a CSV report (example,backend,loc,seconds,status)
+  to FILE (default examples/report.txt), overwriting it."
+
+backends=(proverif tamarin tamarin-unchained)
+backend_set=false
+example=""
+out_csv=""
+declare -A skip
+
+while (( $# > 0 )); do
+  case "$1" in
+    -h|--help) echo "$usage"; exit 0 ;;
+    --skip)
+      [[ -n "${2:-}" ]] || { echo "--skip requires a value" >&2; exit 2; }
+      skip[$2]=1; shift 2 ;;
+    --skip=*)
+      skip[${1#--skip=}]=1; shift ;;
+    -w)
+      out_csv="examples/report.txt"; shift ;;
+    -w=*)
+      out_csv="${1#-w=}"; shift ;;
+    proverif|tamarin|tamarin-unchained)
+      $backend_set && { echo "$usage" >&2; exit 2; }
+      backends=("$1"); backend_set=true; shift ;;
+    -*)
+      echo "$usage" >&2; exit 2 ;;
+    *)
+      [[ -z "$example" ]] || { echo "$usage" >&2; exit 2; }
+      example="$1"; shift ;;
+  esac
+done
+
+eval "$(opam env)"
+source "$SCRIPT_DIR/tamarin-env.sh"
+
+dune build 2>/dev/null   # so the first timed run does not pay the build
+
+diffed_suffixes=(R.os sc.th)
+
+pass=0
+fail=0
+diffs=()
+declare -A be_pass be_total be_time
+for be in "${backends[@]}"; do
+  be_pass[$be]=0
+  be_total[$be]=0
+  be_time[$be]=0.0
+done
+
+[[ -n "$out_csv" ]] && echo "example,backend,loc,seconds,status" > "$out_csv"
+
+if [[ -n "$example" ]]; then
+  ex_dir="examples/${example%/}"
+  if [[ ! -d "$ex_dir" ]]; then
+    echo "no such example: $ex_dir" >&2
+    exit 2
+  fi
+  mapfile -t examples < <(find "$ex_dir" -name G.os -printf '%h\n' | sort)
+else
+  mapfile -t examples < <(find examples -name G.os -printf '%h\n' | sort)
+fi
+if [[ ${#examples[@]} -eq 0 ]]; then
+  echo "no examples found (no G.os under examples/)"
+  exit 0
+fi
+
+echo "Regression tests across ${#examples[@]} example(s):"
+echo
+
+for ex in "${examples[@]}"; do
+  name="${ex#examples/}"
+  loc=$(cat "$ex"/G.os "$ex"/H.os "$ex"/eq.th "$ex"/ac.txt 2>/dev/null | wc -l)
+  echo "  $name"
+  ex_failed=false
+
+  for be in "${backends[@]}"; do
+    echo "    [$be]"
+    if [[ -n "${skip[$be:$name]:-}" || -n "${skip[$name]:-}" ]]; then
+      echo "      SKIP  $name on $be (--skip)"
+      continue
+    fi
+    has_gold=false
+    for suf in "${diffed_suffixes[@]}"; do
+      [[ -f "$ex/sample-$be-$suf" ]] && { has_gold=true; break; }
+    done
+    if ! $has_gold; then
+      echo "      SKIP  no gold files for $be"
+      continue
+    fi
+    ((be_total[$be]++))
+    be_failed=false
+    expect_null=false
+    [[ "$(cat "$ex/sample-$be-R.os" 2>/dev/null)" == "null" ]] && expect_null=true
+    for suf in "${diffed_suffixes[@]}"; do
+      rm -f "$ex/$be-$suf"
+    done
+    t0=$(date +%s.%N)
+    dune exec redsyn -- "$be" "$ex" >/dev/null 2>&1
+    status=$?
+    dt=$(awk -v a="$t0" -v b="$(date +%s.%N)" 'BEGIN{printf "%.1f", b-a}')
+    echo "      time  ${dt}s"
+    be_time[$be]=$(awk -v x="${be_time[$be]}" -v y="$dt" 'BEGIN{printf "%.1f", x+y}')
+    if $expect_null; then
+      if [[ -e "$ex/$be-R.os" ]]; then
+        echo "      CHANGED!  $be-R.os (expected no reduction, got one)"
+        be_failed=true
+        diffs+=("$name/$be-R.os: gold expects no reduction (null), but a reduction was produced:
+$(cat "$ex/$be-R.os")")
+      else
+        echo "      OK    $be-R.os (no reduction, as expected)"
+      fi
+    elif (( status != 0 )); then
+      echo "      FAIL  pipeline crashed"
+      be_failed=true
+    else
+      for suf in "${diffed_suffixes[@]}"; do
+        gold="$ex/sample-$be-$suf"
+        actual="$ex/$be-$suf"
+        label="$be-$suf"
+        if [[ ! -f "$gold" ]]; then
+          echo "      SKIP  $label (no gold)"
+        elif diff -q "$gold" "$actual" >/dev/null 2>&1; then
+          echo "      OK    $label"
+        else
+          echo "      CHANGED!  $label"
+          be_failed=true
+          diffs+=("$(diff -u --label "gold:$name/$label" --label "actual:$name/$label" "$gold" "$actual")")
+        fi
+      done
+    fi
+    if $be_failed; then
+      ex_failed=true
+    else
+      ((be_pass[$be]++))
+    fi
+    if [[ -n "$out_csv" ]]; then
+      echo "$name,$be,$loc,$dt,$($be_failed && echo fail || echo ok)" >> "$out_csv"
+    fi
+  done
+
+  if $ex_failed; then
+    ((fail++))
+  else
+    ((pass++))
+  fi
+done
+
+total=${#examples[@]}
+echo
+echo "$pass/$total examples passed"
+for be in "${backends[@]}"; do
+  echo "  $be: ${be_pass[$be]}/${be_total[$be]} (total ${be_time[$be]}s)"
+done
+[[ -n "$out_csv" ]] && echo "report written to $out_csv"
+
+if (( fail > 0 )); then
+  echo
+  echo "--- diffs ---"
+  for d in "${diffs[@]}"; do
+    echo "$d"
+    echo
+  done
+  exit 1
+fi

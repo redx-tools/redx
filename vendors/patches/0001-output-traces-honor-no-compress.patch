@@ -1,0 +1,43 @@
+Subject: [PATCH] Wire --no-compress flag into --output-dot / --output-json
+
+The --no-compress flag is declared in src/Main/Mode/Batch.hs with help text
+"Do not use compressed sequent visualization", but the trace-output path
+(outputTraces) ignores it: it hard-codes `defaultGraphOptions`, which has
+`_goCompress = True`. As a result,
+
+    tamarin-prover --prove --output-dot=FILE --no-compress in.spthy
+
+produces output byte-identical to running without the flag.
+
+This patch threads the existing flag into the GraphOptions used for both
+--output-dot and --output-json, so the documented behaviour matches reality.
+
+Why this matters for redx: compression is described in
+lib/theory/src/Theory/Constraint/System/Graph/Simplification.hs as
+"Unsound compression of the sequent that drops fully connected learns and
+knows nodes". `compressSystem` can hide intruder KU action nodes whose
+deduced term is a pair / inverse / public / nat (`hideAction`) and ISend /
+IRecv / Coerce / Fresh nodes (`hideRule`). These are precisely the steps a
+reconstructed attacker recipe needs to see. With this patch and the
+existing --no-compress flag, redx's recipe extractor sees the uncompressed
+trace.
+
+This patch applies cleanly to both vendors/tamarin-prover/ and
+vendors/tamarin-unchained/ since they share an identical Batch.hs.
+
+---
+ src/Main/Mode/Batch.hs | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/Main/Mode/Batch.hs b/src/Main/Mode/Batch.hs
+--- a/src/Main/Mode/Batch.hs
++++ b/src/Main/Mode/Batch.hs
+@@ -251,6 +251,8 @@
+         outputTraces :: ClosedTheory -> IO ()
+         outputTraces thy = do
+             let graphOptions = defaultGraphOptions
++                  { _goCompress = not (argExists "noCompress" as)
++                  }
+                 dotOptions = defaultDotOptions
+                 serializeDot (label, system) = D.showDot label $ dotSystemCompact graphOptions dotOptions system
+                 serializeJSON = sequentsToJSONPretty graphOptions

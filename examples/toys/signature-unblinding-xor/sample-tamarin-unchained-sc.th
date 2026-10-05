@@ -1,0 +1,4 @@
+(snd(sm) != m.1 &&
+  verify(fst(sm), snd(sm), pk(sample_key(rsk))) = ok
+  ->
+  xor_ud(snd(sm), ~d_2) != xor_ud(m.1, ~d_2))

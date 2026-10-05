@@ -1,0 +1,9 @@
+(ctstar != enc(sample_enckey(rkE), rE.1, pair(m.1, mac(sample_mackey(rkM), m.1))) &&
+  vermac(fst(dec(sample_enckey(rkE), ctstar)), snd(dec(sample_enckey(rkE), ctstar)), sample_mackey(rkM)) = ok
+  ->
+  fst(dec(sample_enckey(rkE), ctstar)) != m.1)
+
+(ctstar != enc(sample_enckey(rkE), rrE.1, pair(ifte(sample_bit(rb), fst(chal_m0m1.1), snd(chal_m0m1.1)), mac(sample_mackey(rkM), ifte(sample_bit(rb), fst(chal_m0m1.1), snd(chal_m0m1.1))))) &&
+  vermac(fst(dec(sample_enckey(rkE), ctstar)), snd(dec(sample_enckey(rkE), ctstar)), sample_mackey(rkM)) = ok
+  ->
+  fst(dec(sample_enckey(rkE), ctstar)) != ifte(sample_bit(rb), fst(chal_m0m1.1), snd(chal_m0m1.1)))

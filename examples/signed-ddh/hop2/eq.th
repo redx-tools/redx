@@ -1,0 +1,5 @@
+fst(pair(x,y)) = x
+snd(pair(x,y)) = y
+expo(expo(g(), x), y) = expo(g(), mul(x, y))
+verify(m, sign(k,m), pk(k)) = ok()
+

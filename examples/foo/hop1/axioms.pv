@@ -1,0 +1,2 @@
+axiom c:bitstring; event(Stored(c)) && event(EmptyChecked(c)) ==> false.
+axiom cl:bitstring,cr:bitstring; event(Stored(diff[cl,cr])) && event(EmptyChecked(diff[cl,cr])) ==> false.

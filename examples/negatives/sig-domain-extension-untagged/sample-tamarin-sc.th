@@ -1,0 +1,11 @@
+(fst(mstriple) != mtriple.1 &&
+  verify(fst(snd(mstriple)), fst(fst(mstriple)), pk(r)) = ok &&
+  verify(snd(snd(mstriple)), pair(snd(fst(mstriple)), fst(snd(mstriple))), pk(r)) = ok
+  ->
+  fst(fst(mstriple)) != fst(mtriple.1))
+
+(fst(mstriple) != mtriple.1 &&
+  verify(fst(snd(mstriple)), fst(fst(mstriple)), pk(r)) = ok &&
+  verify(snd(snd(mstriple)), pair(snd(fst(mstriple)), fst(snd(mstriple))), pk(r)) = ok
+  ->
+  fst(fst(mstriple)) != pair(snd(mtriple.1), sign(sk(r), fst(mtriple.1))))

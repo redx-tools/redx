@@ -1,0 +1,2 @@
+fst(pair(x,y)) = x
+snd(pair(x,y)) = y

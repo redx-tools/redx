@@ -1,0 +1,7 @@
+(* Example-specific patch. ProVerif's first derivation of bad both stores a
+   Challenged-table entry and finds it absent, which no execution of this game
+   realises, so trace reconstruction fails and ProVerif stops. Excluding that
+   co-occurrence for Challenged entries lets it find the real trace. Not a
+   valid axiom for tables in general: an empty-check may precede the store. *)
+axiom c:bitstring; event(Stored(Challenged_Ev(c))) && event(EmptyChecked(Challenged_Ev(c))) ==> false.
+axiom cl:bitstring,cr:bitstring; event(Stored(Challenged_Ev(diff[cl,cr]))) && event(EmptyChecked(Challenged_Ev(diff[cl,cr]))) ==> false.

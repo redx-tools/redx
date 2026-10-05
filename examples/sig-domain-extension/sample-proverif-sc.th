@@ -1,0 +1,20 @@
+(fst(mstriple) != mtriple.1 &&
+  verify(fst(snd(snd(mstriple))), pair(fst(snd(mstriple)), pair(ell, pair(idxone, fst(fst(fst(mstriple)))))), pk(r)) = ok &&
+  verify(fst(snd(snd(snd(mstriple)))), pair(fst(snd(mstriple)), pair(ell, pair(idxtwo, snd(fst(fst(mstriple)))))), pk(r)) = ok &&
+  verify(snd(snd(snd(snd(mstriple)))), pair(fst(snd(mstriple)), pair(ell, pair(idxthree, snd(fst(mstriple))))), pk(r)) = ok
+  ->
+  pair(fst(snd(mstriple)), pair(ell, pair(idxtwo, snd(fst(fst(mstriple)))))) != pair(rid.1, pair(ell, pair(idxone, fst(fst(mtriple.1))))))
+
+(fst(mstriple) != mtriple.1 &&
+  verify(fst(snd(snd(mstriple))), pair(fst(snd(mstriple)), pair(ell, pair(idxone, fst(fst(fst(mstriple)))))), pk(r)) = ok &&
+  verify(fst(snd(snd(snd(mstriple)))), pair(fst(snd(mstriple)), pair(ell, pair(idxtwo, snd(fst(fst(mstriple)))))), pk(r)) = ok &&
+  verify(snd(snd(snd(snd(mstriple)))), pair(fst(snd(mstriple)), pair(ell, pair(idxthree, snd(fst(mstriple))))), pk(r)) = ok
+  ->
+  pair(fst(snd(mstriple)), pair(ell, pair(idxtwo, snd(fst(fst(mstriple)))))) != pair(rid.1, pair(ell, pair(idxtwo, snd(fst(mtriple.1))))))
+
+(fst(mstriple) != mtriple.1 &&
+  verify(fst(snd(snd(mstriple))), pair(fst(snd(mstriple)), pair(ell, pair(idxone, fst(fst(fst(mstriple)))))), pk(r)) = ok &&
+  verify(fst(snd(snd(snd(mstriple)))), pair(fst(snd(mstriple)), pair(ell, pair(idxtwo, snd(fst(fst(mstriple)))))), pk(r)) = ok &&
+  verify(snd(snd(snd(snd(mstriple)))), pair(fst(snd(mstriple)), pair(ell, pair(idxthree, snd(fst(mstriple))))), pk(r)) = ok
+  ->
+  pair(fst(snd(mstriple)), pair(ell, pair(idxtwo, snd(fst(fst(mstriple)))))) != pair(rid.1, pair(ell, pair(idxthree, snd(mtriple.1)))))

@@ -1,0 +1,3 @@
+fst(pair(x,y)) = x
+snd(pair(x,y)) = y
+verify(m, hash(k,m), k) = ok()

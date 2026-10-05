@@ -1,0 +1,4 @@
+(snd(sm) != m.1 &&
+  verify(fst(sm), f(snd(sm)), pk(sample_key(rsk))) = ok
+  ->
+  f(snd(sm)) != f(m.1))

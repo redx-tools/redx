@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+
+docker build -t redx "$SCRIPT_DIR"
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$SCRIPT_DIR/examples:/home/opam/redx/examples" \
+    redx "$@"

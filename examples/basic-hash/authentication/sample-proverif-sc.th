@@ -1,0 +1,4 @@
+(fst(tagstar) != n.1 &&
+  verify(fst(tagstar), snd(tagstar), sample_key(rk)) = ok
+  ->
+  fst(tagstar) != n.1)

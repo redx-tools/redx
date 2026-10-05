@@ -1,0 +1,4 @@
+fst(pair(x,y)) = x
+snd(pair(x,y)) = y
+modexp(modexp(x, e(r), N(r)), d(r), N(r)) = x
+modexp(modexp(x, d(r), N(r)), e(r), N(r)) = x

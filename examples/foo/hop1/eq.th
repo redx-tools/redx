@@ -1,0 +1,19 @@
+//Encryption schema
+dec(enc(m,pk(sk),r),sk) = m
+
+//Commitement
+open(commit(v,k),k) = v
+
+//Pair
+fst(pair(m0,m1)) = m0 
+snd(pair(m0,m1)) = m1
+
+//Blind singature
+baccepte( c, pkS(k), tk, bsign( blind(c,pkS(k),tk),k) ) = ok()
+
+//Ballot box
+voted(a,bb(a,b,c)) = ok()
+voted(b,bb(a,b,c)) = ok()
+voted(c,bb(a,b,c)) = ok()
+
+

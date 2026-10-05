@@ -1,0 +1,5 @@
+(fst(fst(yB)) = pk(sample_key(rkB)) &&
+  verify(pair(pair(expo(g, sample_exp(ra)), snd(fst(yB))), pk(sample_key(rkA))), snd(yB), pk(sample_key(rkB))) = ok &&
+  snd(fst(yB)) != expo(g, sample_exp(rb))
+  ->
+  pair(pair(expo(g, sample_exp(ra)), snd(fst(yB))), pk(sample_key(rkA))) != pair(pair(snd(x.1), expo(g, sample_exp(rb))), fst(x.1)))

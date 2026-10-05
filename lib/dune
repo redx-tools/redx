@@ -1,0 +1,12 @@
+(library
+ (name redx)
+ (libraries str dot yojson)
+ (modules types osstring resolve normalise subst trace matching gensideconds
+          reconstruct compileH compileG extractors wf
+          lexer parser proverif proverif_attack_parser diff
+          tamarin tamarin_attack_parser tamarin_trace_json unify lpo kb ac))
+
+(ocamllex lexer)
+
+(menhir
+ (modules parser))
