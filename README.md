@@ -1,8 +1,9 @@
 # redx — reduction synthesis for cryptographic proofs
 
 This is the artifact of the paper *Automatic Synthesis of Cryptographic
-Reductions Using Symbolic Verification Tools*, containing our tool, redx,
-and our benchmark suite.
+Reductions Using Symbolic Verification Tools* by Prashant Agrawal, Manuel
+Barbosa, Gilles Barthe, Adrien Koutsos, and Justine Sauvage. It contains
+our tool, redx, and our benchmark suite.
 
 redx synthesises cryptographic reductions. A problem consists of a
 target security game G, a hard problem H, and an equational theory E.
